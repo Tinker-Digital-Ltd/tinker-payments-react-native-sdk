@@ -28,6 +28,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Tinker-Digital-Ltd/tinker-payments-web-sdk
+          ref: ${{ github.head_ref || github.ref_name }}
           path: web-sdk
       - run: npm install && npm run build
         working-directory: web-sdk
