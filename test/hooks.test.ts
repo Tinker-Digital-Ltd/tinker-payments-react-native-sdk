@@ -63,3 +63,26 @@ test('refresh reloads data', async () => {
   });
   assert.equal(result().data?.current_offering_id, 'o2');
 });
+
+test('identifier change clears previous data', async () => {
+  const { client } = makeClient((url) => ok({ identifier: url.split('/').pop(), is_active: true }));
+  let identifier = 'a';
+  const seen: { current?: QueryResult<{ identifier: string }> } = {};
+  function Probe() {
+    seen.current = useEntitlement(client, identifier) as QueryResult<{ identifier: string }>;
+    return null;
+  }
+  let renderer!: ReturnType<typeof create>;
+  await act(async () => {
+    renderer = create(React.createElement(Probe));
+  });
+  assert.equal(seen.current!.data?.identifier, 'a');
+  identifier = 'b';
+  act(() => {
+    renderer.update(React.createElement(Probe));
+  });
+  assert.equal(seen.current!.data as unknown, null);
+  assert.equal(seen.current!.loading, true);
+  await act(async () => {});
+  assert.equal(seen.current!.data?.identifier as string, 'b');
+});

@@ -23,6 +23,10 @@ export const tinker = new TinkerClient({
 
 Keys starting with `pk_test_` use the sandbox API. On `TOKEN_INVALID` the SDK fetches a new token and retries once. See the web SDK for the full client API (`getCustomerInfo`, `getEntitlement`, `isEntitled`, `getOfferings`, `setAttributes`) and errors.
 
+`getCustomerInfo` returns 404 `CUSTOMER_NOT_FOUND` for a customer with no purchases, promotions or attributes yet.
+
+Create the client once, outside components or with `useMemo`, not on every render.
+
 ## Hooks
 
 Each returns `{ data, error, loading, refresh }`.
