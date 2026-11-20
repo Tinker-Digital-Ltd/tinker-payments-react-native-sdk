@@ -55,13 +55,13 @@ test('useOfferings exposes errors', async () => {
 
 test('refresh reloads data', async () => {
   let n = 0;
-  const { client } = makeClient(() => ok({ current_offering_id: `o${++n}`, offerings: [] }));
+  const { client } = makeClient(() => ok({ current_offering_identifier: `o${++n}`, offerings: [] }));
   const result = await render(() => useOfferings(client));
-  assert.equal(result().data?.current_offering_id, 'o1');
+  assert.equal(result().data?.current_offering_identifier, 'o1');
   await act(async () => {
     await result().refresh();
   });
-  assert.equal(result().data?.current_offering_id, 'o2');
+  assert.equal(result().data?.current_offering_identifier, 'o2');
 });
 
 test('identifier change clears previous data', async () => {
