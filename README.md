@@ -21,7 +21,9 @@ export const tinker = new TinkerClient({
 });
 ```
 
-Keys starting with `pk_test_` use the sandbox API. On `TOKEN_INVALID` the SDK fetches a new token and retries once. See the web SDK for the full client API (`getCustomerInfo`, `getEntitlement`, `isEntitled`, `getOfferings`, `setAttributes`) and errors.
+Keys starting with `pk_test_` use the sandbox API. On `TOKEN_INVALID` the SDK fetches a new token and retries once. See the web SDK for the full client API (`getCustomerInfo`, `getEntitlement`, `isEntitled`, `getOfferings`, `setAttributes`, `paywallUrl`) and errors.
+
+`setAttributes` rejects keys starting with `$` with 403 `RESERVED_ATTRIBUTE`; those are set from the server only.
 
 `getCustomerInfo` returns 404 `CUSTOMER_NOT_FOUND` for a customer with no purchases, promotions or attributes yet.
 
@@ -42,6 +44,16 @@ function Paywall() {
   return pro?.is_active ? <Pro /> : <Offerings offerings={offerings} />;
 }
 ```
+
+## Hosted paywall
+
+```ts
+import { Linking } from 'react-native';
+
+await Linking.openURL(await tinker.paywallUrl({ returnUrl: 'myapp://after-purchase', offering: 'default' }));
+```
+
+The URL carries `pk`, the current customer token, `return_url` and the optional `offering` (omit it for the current offering), all URL-encoded. The hosted page only accepts a `https` return URL (or `http://localhost`), so use a universal link or an https page that opens your app. The customer comes back with `package`, `offering`, `product_id` and `billing_period` appended. Pass `paywallBaseUrl` to the client to override the site origin (default `https://tinkerpayments.com`, path `/paywall`).
 
 ## Purchases
 

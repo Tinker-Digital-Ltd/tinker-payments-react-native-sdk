@@ -30,6 +30,13 @@ async function render<T>(useHook: () => QueryResult<T>) {
 
 const ok = (data: unknown) => ({ status: 200, body: { success: true, data } });
 
+test('paywallUrl is available on the re-exported client', async () => {
+  const { client } = makeClient(() => ok({}));
+  const url = new URL(await client.paywallUrl({ returnUrl: 'myapp://done', offering: 'default' }));
+  assert.equal(url.origin + url.pathname, 'https://tinkerpayments.com/paywall');
+  assert.deepEqual(Object.fromEntries(url.searchParams), { pk: 'pk_test_x', token: 't', return_url: 'myapp://done', offering: 'default' });
+});
+
 test('useCustomerInfo loads data', async () => {
   const { client } = makeClient(() => ok({ external_customer_id: 'c1' }));
   const result = await render(() => useCustomerInfo(client));
